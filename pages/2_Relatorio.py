@@ -90,12 +90,27 @@ def resume_tabela(df, colunas_agrupar):
 
         # Calculando as estatísticas de resumo
     resultados = df.groupby(colunas_agrupar).agg({
-        col: ['mean',
+        col: ['count',
+            'mean',
             'min',
             lambda x: x.quantile(0.05), 
-            lambda x: x.quantile(0.25), 
+            lambda x: x.quantile(0.10),
+            lambda x: x.quantile(0.15),
+            lambda x: x.quantile(0.20), 
+            lambda x: x.quantile(0.25),
+            lambda x: x.quantile(0.30),
+            lambda x: x.quantile(0.35),
+            lambda x: x.quantile(0.40), 
+            lambda x: x.quantile(0.45),
             lambda x: x.quantile(0.50),
+            lambda x: x.quantile(0.55),
+            lambda x: x.quantile(0.60),
+            lambda x: x.quantile(0.65),
+            lambda x: x.quantile(0.70), 
             lambda x: x.quantile(0.75),
+            lambda x: x.quantile(0.80),
+            lambda x: x.quantile(0.85),
+            lambda x: x.quantile(0.90),
             lambda x: x.quantile(0.95),
             'max'] for col in colunas_numericas
     })
@@ -103,14 +118,29 @@ def resume_tabela(df, colunas_agrupar):
 
     renomear = {}
     for col in colunas_numericas:
+        renomear[col+'_count'] = col+'__contagem'
         renomear[col+'_mean'] = col+'__média'
         renomear[col+'_min'] = col+'__mínimo'
         renomear[col+'_max'] = col+'__máximo'
         renomear[col+'_<lambda_0>'] = col+'__p05'
-        renomear[col+'_<lambda_1>'] = col+'__p25'
-        renomear[col+'_<lambda_2>'] = col+'__p50'
-        renomear[col+'_<lambda_3>'] = col+'__p75'
-        renomear[col+'_<lambda_4>'] = col+'__p95'
+        renomear[col+'_<lambda_1>'] = col+'__p10'        
+        renomear[col+'_<lambda_2>'] = col+'__p15'
+        renomear[col+'_<lambda_3>'] = col+'__p20'
+        renomear[col+'_<lambda_4>'] = col+'__p25'
+        renomear[col+'_<lambda_5>'] = col+'__p30'
+        renomear[col+'_<lambda_6>'] = col+'__p35'
+        renomear[col+'_<lambda_7>'] = col+'__p40'
+        renomear[col+'_<lambda_8>'] = col+'__p45'
+        renomear[col+'_<lambda_9>'] = col+'__p50'
+        renomear[col+'_<lambda_10>'] = col+'__p55'
+        renomear[col+'_<lambda_11>'] = col+'__p60'
+        renomear[col+'_<lambda_12>'] = col+'__p65'        
+        renomear[col+'_<lambda_13>'] = col+'__p70'
+        renomear[col+'_<lambda_14>'] = col+'__p75'
+        renomear[col+'_<lambda_15>'] = col+'__p80'
+        renomear[col+'_<lambda_16>'] = col+'__p85'
+        renomear[col+'_<lambda_17>'] = col+'__p90'
+        renomear[col+'_<lambda_18>'] = col+'__p95'
     resultados.rename(columns=renomear, inplace=True)
 
     resultados = (resultados
@@ -150,26 +180,28 @@ def df_to_download(df):
 
 if 'data' in st.session_state:
     
-    
-    df_filtrado, lst_fatores = filter_dataframe(st.session_state.data)      
-    st.title("Tabela filtrada") 
-    st.dataframe(df_filtrado)
+    df_filtrado, lst_fatores = filter_dataframe(st.session_state.data)
 
-    st.download_button(
-        label="Download",
-        data=df_to_download(df_filtrado),
-        file_name="tabela_filtrada.csv",
-        mime="text/csv",
-    )
-
-    if len(lst_fatores) > 0:
-        st.title("Estatísticas de resumo")
-        df_resumo = resume_tabela(df_filtrado, lst_fatores)
-        st.dataframe(df_resumo)
+    with st.container(): 
+        st.title("Tabela filtrada") 
+        st.dataframe(df_filtrado)
 
         st.download_button(
             label="Download",
-            data=df_to_download(df_resumo),
-            file_name='tabela_estatisticas.csv',
-            mime='text/csv'
+            data=df_to_download(df_filtrado),
+            file_name="tabela_filtrada.csv",
+            mime="text/csv",
         )
+
+    if len(lst_fatores) > 0:
+        with st.container(): 
+            st.title("Estatísticas de resumo")
+            df_resumo = resume_tabela(df_filtrado, lst_fatores)
+            st.dataframe(df_resumo)
+
+            st.download_button(
+                label="Download",
+                data=df_to_download(df_resumo),
+                file_name='tabela_estatisticas.csv',
+                mime='text/csv'
+            )
